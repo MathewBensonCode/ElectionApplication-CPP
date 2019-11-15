@@ -1,0 +1,8 @@
+build/
+odb-gen/
+*.cxx
+*.ixx
+*-odb.*
+*.plist
+.clangd/
+compile_commands.json
