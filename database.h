@@ -1,11 +1,7 @@
-#include <odb/database.hxx> 
-#include <odb/sqlite/database.hxx> 
-#include <memory> 
-#include <string>
-#include <iostream>
+#include <odb/database.hxx>
+#include <odb/sqlite/database.hxx>
+#include <memory>
 
-std::unique_ptr<odb::database> 
-create_database() {
-     auto database = std::make_unique<odb::sqlite::database>(std::string{"../Elections.db"}); 
-     return database;
-}
+std::shared_ptr<odb::database>
+create_database();
+

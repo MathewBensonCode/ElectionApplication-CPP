@@ -1,24 +1,37 @@
 #pragma once
 
-#include <string>
 #include <odb/core.hxx>
+#include <string>
+#include <vector>
+#include <memory>
 
-#pragma db object
-class Candidates
-{
-	friend odb::access;
+class CandidateResult;
 
-#pragma db id
-	int _id;
-	std::string _name;
+class Candidate {
+
+  unsigned int m_id{};
+  std::string m_name{};
+
+  std::vector<std::weak_ptr<CandidateResult>> m_candidateresults;
+
+  friend odb::access;
+
 public:
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
-	Candidates():_id(0),_name("") { }
+  [[nodiscard]] const std::string &Name() const;
+  void Name(const std::string &);
 
-	const int& Id() {return _id;} const
-	void Id(const int& myid){_id=myid;}
-
-	const std::string& Name(){return _name; }const
-	void Name(const std::string& name) { _name = name;}
-	
+  [[nodiscard]] const std::vector<std::weak_ptr<CandidateResult>> &CandidateResults() const;
 };
+
+#ifdef ODB_COMPILER
+
+#include "CandidateResult.hxx"
+
+#pragma db object(Candidate) table("Candidates")
+#pragma db member(Candidate::m_id) id
+#pragma db member(Candidate::m_candidateresults) inverse(m_candidate)
+
+#endif

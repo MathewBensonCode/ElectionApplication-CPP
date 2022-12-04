@@ -1,28 +1,42 @@
 #pragma once
 
 #include <string>
-#include <odb/core.hxx>
 #include <memory>
-#include "County.hxx"
+#include <vector>
+#include <odb/core.hxx>
 
-#pragma db object
-class Constituencies
+
+class County;
+class Ward;
+
+class Constituency
 {
-#pragma db id
-	int _id;
-	std::string _name;
-	std::unique_ptr<Counties> _CountyId;
+  unsigned int m_id {};
+  std::string m_name{};
 
-	friend odb::access;
+  std::shared_ptr<County> m_county{};
+  std::vector<std::weak_ptr<Ward>> m_wards{};
+
+  friend class odb::access;
+
 public:
-	Constituencies():_id(0), _name(""), _CountyId(nullptr)
-	{}
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
-	const int& Id() const {return _id;}
-	void Id(const int& id){_id = id;}
+  [[nodiscard]] const std::string& Name() const;
+  void Name(const std::string&);
 
-	const std::string& Name() const {return _name;}
-	void Name(const std::string& name) {_name = name;}
+  [[nodiscard]] const std::shared_ptr<County>& ConstituencyCounty() const;
 
-	Counties& County() const { return *_CountyId;}
+  [[nodiscard]] const std::vector<std::weak_ptr<Ward>> &Wards() const;
 };
+
+#ifdef ODB_COMPILER
+#include "County.hxx"
+#include "Ward.hxx"
+#pragma db object(Constituency) table("Constituencies")
+#pragma db member(Constituency::m_id) id
+#pragma db member(Constituency::m_county) column("CountyId") not_null
+#pragma db member(Constituency::m_wards) inverse(m_constituency)
+
+#endif

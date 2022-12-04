@@ -1,28 +1,46 @@
 #pragma once
 
-#include <string>
-#include <odb/core.hxx>
-#include "Ward.hxx"
 #include <memory>
+#include <odb/core.hxx>
+#include <string>
+#include <vector>
 
-#pragma db object
-class PollingCentres
-{
-	friend odb::access;
+class Ward;
+class PollingStation;
 
-#pragma db id
-	int _id;
-	std::string _name;
-	std::unique_ptr<Wards> _WardId;
+class PollingCenter {
+
+  int m_id{};
+
+  std::string m_name{};
+
+  std::shared_ptr<Ward> m_ward{};
+
+  std::vector<std::weak_ptr<PollingStation>> m_pollingstations;
+
+  friend odb::access;
+
 public:
+  [[nodiscard]] int Id() const;
+  void Id(int);
 
-	PollingCentres():_id(0),_name(""), _WardId(nullptr) { }
+  [[nodiscard]] const std::string &Name() const;
+  void Name(const std::string &);
 
-	const int& Id() const {return _id;} 
-	void Id(const int& myid){_id=myid;}
+  [[nodiscard]] const std::shared_ptr<Ward> &ConsituencyWard() const;
 
-	const std::string& Name() const {return _name; }
-	void Name(const std::string& name) { _name = name;}
-
-	Wards& Ward() const {return *_WardId;}
+  [[nodiscard]] const std::vector<std::weak_ptr<PollingStation>> &
+  PollingStations() const;
 };
+
+#ifdef ODB_COMPILER
+
+#include "PollingStation.hxx"
+#include "Ward.hxx"
+
+#pragma db object(PollingCenter) table("PollingCentres")
+#pragma db member(PollingCenter::m_id) id
+#pragma db member(PollingCenter::m_ward) column("WardId") not_null
+#pragma db member(PollingCenter::m_pollingstations) inverse(m_pollingcenter)
+
+#endif

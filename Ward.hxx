@@ -1,28 +1,44 @@
 #pragma once
 
-#include <string>
-#include <odb/core.hxx>
 #include <memory>
-#include "Constituency.hxx"
+#include <odb/core.hxx>
+#include <string>
+#include <vector>
 
-#pragma db object
-class Wards
-{
-	friend odb::access;
+class Constituency;
+class PollingCenter;
 
-#pragma db id
-	int _id;
-	std::string _name;
-	std::unique_ptr<Constituencies> _ConstituencyId;
+class Ward {
+
+  unsigned int m_id{};
+  std::string m_name{};
+
+  std::shared_ptr<Constituency> m_constituency{};
+  std::vector<std::weak_ptr<PollingCenter>> m_pollingcenters;
+
+  friend odb::access;
+
 public:
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
-	Wards():_id(0),_name(""), _ConstituencyId(nullptr) { }
+  [[nodiscard]] const std::string &Name() const;
+  void Name(const std::string &);
 
-	const int& Id() const {return _id;} 
-	void Id(const int& myid){_id=myid;}
-
-	const std::string& Name() const {return _name; }
-	void Name(const std::string& name) { _name = name;}
-
-	Constituencies& Constituency() const {return *_ConstituencyId;}
+  [[nodiscard]] const std::shared_ptr<Constituency> &WardConstituency() const;
+  [[nodiscard]] const std::vector<std::weak_ptr<PollingCenter>> &
+  PollingCenters() const;
 };
+
+#ifdef ODB_COMPILER
+
+#include "Constituency.hxx"
+#include "PollingCenter.hxx"
+
+#pragma db object(Ward) table("Wards")
+#pragma db member(Ward::m_id) id
+#pragma db member(Ward::m_constituency) not_null column("ConstituencyId")
+#pragma db member(Ward::m_pollingcenters) inverse(m_ward)
+
+
+#endif

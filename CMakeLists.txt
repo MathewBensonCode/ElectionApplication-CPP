@@ -1,48 +1,112 @@
-cmake_minimum_required(VERSION 3.14)
-
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
-set(CMAKE_BUILD_TYPE Release)
+cmake_minimum_required(VERSION 3.20...3.24)
 
 project(ElectionsCount CXX)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include(cmake/StandardProjectSettings.cmake)
+include(cmake/PreventInSourceBuilds.cmake)
+
+# Link this 'library' to set the c++ standard / compile-time options requested
+add_library(project_options INTERFACE)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+  option(ENABLE_BUILD_WITH_TIME_TRACE
+         "Enable -ftime-trace to generate time tracing .json files on clang"
+         OFF)
+  if(ENABLE_BUILD_WITH_TIME_TRACE)
+    target_compile_options(project_options INTERFACE -ftime-trace)
+  endif()
+endif()
+
+# Link this 'library' to use the warnings specified in CompilerWarnings.cmake
+add_library(project_warnings INTERFACE)
+
+# enable cache system
+include(cmake/Cache.cmake)
+
+# Add linker configuration
+include(cmake/Linker.cmake)
+configure_linker(project_options)
+
+# standard compiler warnings
+include(cmake/CompilerWarnings.cmake)
+set_project_warnings(project_warnings)
+
+# sanitizer options if supported by compiler
+include(cmake/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
+# enable doxygen
+include(cmake/Doxygen.cmake)
+enable_doxygen()
+
+# allow for static analysis options
+include(cmake/StaticAnalyzers.cmake)
+
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+set(ElectionCount_Sources
+    County.cpp
+    Constituency.cpp
+    Ward.cpp
+    PollingCenter.cpp
+    PollingStation.cpp
+    ResultsForm34A.cpp
+    Candidate.cpp
+    CandidateResult.cpp)
+
+set(ElectionCount_Headers
+    County.hxx
+    Constituency.hxx
+    Ward.hxx
+    PollingCenter.hxx
+    PollingStation.hxx
+    ResultsForm34A.hxx
+    Candidate.hxx
+    CandidateResult.hxx
+    votes_view.hxx
+)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 find_package(ODB REQUIRED COMPONENTS sqlite)
 include(${ODB_USE_FILE})
 
-set(ElectionCount_Sources
-	Main.cpp
-	database.h
-   )
+odb_compile(
+  ElectionCount_Odb_Sources
+  FILES
+  ${ElectionCount_Headers}
+  DB
+  sqlite
+  GENERATE_QUERY
+  GENERATE_SESSION
+  STANDARD
+  c++20)
 
-set(ElectionCount_Headers
-	County.hxx
-	Constituency.hxx
-	Ward.hxx
-	PollingCenter.hxx
-	PollingStation.hxx
-	ResultsForm34A.hxx
-	Candidate.hxx
-	CandidateResult.hxx
-)
+add_library(ElectionCountLib ${ElectionCount_Sources})
 
-odb_compile(ElectionCount_Sources FILES ${ElectionCount_Headers} DB sqlite GENERATE_QUERY GENERATE_SESSION STANDARD c++17) 
+target_include_directories(ElectionCountLib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+target_link_libraries(ElectionCountLib PUBLIC project_options project_warnings)
+
+add_library(ElectionOdb ${ElectionCount_Odb_Sources})
+
+target_compile_definitions(ElectionOdb PUBLIC DATABASE_SQLITE)
+
+target_include_directories(ElectionOdb PUBLIC ${ODB_INCLUDE_DIRS}
+                                              ${ODB_COMPILE_OUTPUT_DIR})
 
 add_executable(ElectionCount 
-	${ElectionCount_Sources}
-	)
-set_property(TARGET ElectionCount PROPERTY CXXSTANDARD 17)
+    Main.cpp
+    database.cpp
+    )
 
-target_link_libraries(ElectionCount 
-	PRIVATE
-		${ODB_LIBRARIES})
+target_link_libraries(ElectionCount PRIVATE ElectionCountLib ElectionOdb ${ODB_LIBRARIES})
 
-target_include_directories(ElectionCount
-	PRIVATE
-		${ODB_INCLUDE_DIRS}
-		${ODB_COMPILE_OUTPUT_DIR})
-
-target_compile_definitions(ElectionCount
-	PRIVATE
-		DATABASE_SQLITE)
+# file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
+# ${CMAKE_SOURCE_DIR}/compile_commands.json)

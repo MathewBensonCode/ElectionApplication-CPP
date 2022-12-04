@@ -1,32 +1,44 @@
 #pragma once
 
-#include <string>
-#include <odb/core.hxx>
-#include "Candidate.hxx"
-#include "ResultsForm34A.hxx"
 #include <memory>
+#include <odb/core.hxx>
 
-#pragma db object
-class CandidateResults
+class Candidate;
+class ResultsForm34A;
+   
+class CandidateResult
 {
-	friend odb::access;
+  unsigned int m_id{};
 
-#pragma db id
-	int _id;
-	std::unique_ptr<Candidates> _CandidateId;
-	std::unique_ptr<ResultsForm34As> _ResultsForm34AId;
-	int _Votes;
+  std::shared_ptr<Candidate> m_candidate{};
+
+  std::shared_ptr<ResultsForm34A> m_resultsform34A{};
+
+  unsigned int m_votes{};
+
+  friend odb::access;
 
 public:
 
-	CandidateResults():_id(0), _CandidateId(nullptr), _ResultsForm34AId(nullptr),  _Votes(0) { }
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
-	const int& Id() {return _id;} const
-	void Id(const int& myid){_id=myid;}
+  [[nodiscard]] const std::shared_ptr<Candidate> &ElectionCandidate() const;
 
-	Candidates& Candidate(){return *_CandidateId;}
+  [[nodiscard]] const std::shared_ptr<ResultsForm34A> &ResultsForm() const;
 
-	ResultsForm34As& ResultsForm34A(){return *_ResultsForm34AId;}	
+  [[nodiscard]] unsigned int Votes() const;
 
-	const int& Votes(){return _Votes;}
 };
+
+#ifdef ODB_COMPILER
+
+#include "Candidate.hxx"
+#include "ResultsForm34A.hxx"
+
+#pragma db object(CandidateResult) table("CandidateResults")
+#pragma db member(CandidateResult::m_id) id
+#pragma db member(CandidateResult::m_candidate) not_null column("CandidateId")
+#pragma db member(CandidateResult::m_resultsform34A) not_null column("ResultsForm34AId")
+
+#endif

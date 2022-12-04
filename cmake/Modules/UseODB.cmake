@@ -1,8 +1,7 @@
-
 set(ODB_COMPILE_DEBUG FALSE)
 set(ODB_COMPILE_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/odb_gen")
-set(ODB_COMPILE_HEADER_SUFFIX ".h")
-set(ODB_COMPILE_INLINE_SUFFIX "_inline.h")
+set(ODB_COMPILE_HEADER_SUFFIX ".hpp")
+set(ODB_COMPILE_INLINE_SUFFIX "_inline.hpp")
 set(ODB_COMPILE_SOURCE_SUFFIX ".cpp")
 set(ODB_COMPILE_FILE_SUFFIX "_odb")
 
@@ -34,6 +33,8 @@ function(odb_compile outvar)
 
 	set(ODB_ARGS)
 
+    list(APPEND ODB_ARGS --default-pointer std::shared_ptr)
+
 	if(PARAM_MULTI_DATABASE)
 		list(APPEND ODB_ARGS --multi-database "${PARAM_MULTI_DATABASE}")
 		list(APPEND PARAM_DB common)
@@ -52,7 +53,7 @@ function(odb_compile outvar)
 	endif()
 
 	if(PARAM_GENERATE_SCHEMA)
-		list(APPEND ODB_ARGS --generate-schema)
+		list(APPEND ODB_ARGS --generate-schema --at-once)
 	endif()
 
 	if(PARAM_GENERATE_PREPARED)
@@ -135,6 +136,7 @@ function(odb_compile outvar)
 	foreach(dir ${PARAM_INCLUDE} ${ODB_INCLUDE_DIRS})
 		list(APPEND ODB_ARGS "-I${dir}")
 	endforeach()
+
 
 	file(REMOVE_RECURSE "${ODB_COMPILE_OUTPUT_DIR}")
 	file(MAKE_DIRECTORY "${ODB_COMPILE_OUTPUT_DIR}")

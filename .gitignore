@@ -1,8 +1,12 @@
 build/
 odb-gen/
+odb_gen/
 *.cxx
 *.ixx
 *-odb.*
 *.plist
 .clangd/
 compile_commands.json
+CMakeCache.txt
+.cache
+Election_Count

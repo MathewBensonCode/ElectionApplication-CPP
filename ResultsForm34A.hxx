@@ -1,29 +1,45 @@
 #pragma once
 
+#include <memory>
 #include <string>
+#include <vector>
 #include <odb/core.hxx>
-#include "PollingStation.hxx"
 
-#pragma db object
-class ResultsForm34As
-{
-	friend odb::access;
+class PollingStation;
+class CandidateResult;
 
-#pragma db id
-	int _id;
-	std::string _ImageUrl;
-	std::unique_ptr<PollingStation> _PollingStationId;
+class ResultsForm34A {
+
+  unsigned int m_id{};
+
+  std::string m_imageUrl{};
+
+  std::shared_ptr<PollingStation> m_pollingstation{};
+  
+  std::vector<std::weak_ptr<CandidateResult>> m_candidateresults{};
+
+  friend odb::access;
+
 public:
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
-	ResultsForm34As():_id(0), _ImageUrl(""), _PollingStationId(nullptr) { }
+  [[nodiscard]] const std::string &ImageUrl() const;
+  void ImageUrl(const std::string &);
 
-	const int& Id() const {return _id;} 
-	void Id(const int& myid){_id=myid;}
+  [[nodiscard]] const std::shared_ptr<PollingStation> &Pollingstation() const;
 
-	const std::string& ImageUrl() const {return _ImageUrl; }
-	void ImageUrl(const std::string& imageurl) { _ImageUrl = imageurl;}
-
-	PollingStation& GetPollingStation() const {return *_PollingStationId;}
-
+  [[nodiscard]] const std::vector<std::weak_ptr<CandidateResult>> &Candidateresults() const;
 };
 
+#ifdef ODB_COMPILER
+
+#include "CandidateResult.hxx"
+#include "PollingStation.hxx"
+
+#pragma db object(ResultsForm34A) table("ResultsForm34As")
+#pragma db member(ResultsForm34A::m_id) id
+#pragma db member(ResultsForm34A::m_pollingstation) column("PollingStationId") not_null
+#pragma db member(ResultsForm34A::m_candidateresults) inverse(m_resultsform34A)
+
+#endif

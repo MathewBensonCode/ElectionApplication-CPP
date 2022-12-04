@@ -1,31 +1,47 @@
 #pragma once
 
-#include <string>
-#include <odb/core.hxx>
-#include "PollingCenter.hxx"
 #include <memory>
+#include <string>
+#include <vector>
+#include <odb/core.hxx>
 
-#pragma db object
-class PollingStation
-{
-	friend odb::access;
+class PollingCenter;
+class ResultsForm34A;
 
-#pragma db id
-	int _id;
-	int _AltId;
-	std::string _name;
-	std::unique_ptr<PollingCentres> _PollingCenterId;
+class PollingStation {
+  unsigned int m_id{};
+
+  unsigned int m_altId{};
+
+  std::string m_name{};
+
+  std::shared_ptr<PollingCenter> m_pollingcenter{};
+
+  std::vector<std::weak_ptr<ResultsForm34A>> m_resultsform34As{};
+
+  friend odb::access;
+
 public:
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
-	PollingStation():_id(0), _AltId(0), _name(""), _PollingCenterId(nullptr) { }
+  [[nodiscard]] unsigned int altId() const;
 
-	const int& Id() const {return _id;}
-	void Id(const int& myid){_id=myid;}
+  [[nodiscard]] const std::string &Name() const;
+  void Name(const std::string &);
 
-	const int& AltId() const {return _AltId;};
+  [[nodiscard]] const std::shared_ptr<PollingCenter> &WardPollingCenter() const;
 
-	const std::string& Name() const {return _name; }
-	void Name(const std::string& name) { _name = name;}
-
-	PollingCentres& PollingCenter() const {return *_PollingCenterId;}
+  [[nodiscard]] const std::vector<std::weak_ptr<ResultsForm34A>> &ResultsForm34As() const;
 };
+
+#ifdef ODB_COMPILER
+#include "PollingCenter.hxx"
+#include "ResultsForm34A.hxx"
+#pragma db object(PollingStation) table("PollingStation")
+#pragma db member(PollingStation::m_id) id
+#pragma db member(PollingStation::m_altId) column("AltId")
+#pragma db member(PollingStation::m_pollingcenter) column("PollingCenterId") not_null
+#pragma db member(PollingStation::m_resultsform34As) inverse(m_pollingstation)
+
+#endif
