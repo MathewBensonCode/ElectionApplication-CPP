@@ -8,4 +8,6 @@ Its purpose is to find a way of calculating the results of the elections in a wa
 
 ## Object Relational Mapping (ORM)
 
-The database ORM chosen for this application is based on ODB by codesynthesis.com which is a C++ based object relational mapper
+The database ORM chosen for this application is based on ODB by [codesynthesis](https://codesynthesis.com/products/odb/) which is a C++ based object relational mapper.
+
+It is required that the ODB system is installed on the system. To do this follow the instructions on 

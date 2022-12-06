@@ -50,59 +50,11 @@ include(cmake/StaticAnalyzers.cmake)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-set(ElectionCount_Sources
-    County.cpp
-    Constituency.cpp
-    Ward.cpp
-    PollingCenter.cpp
-    PollingStation.cpp
-    ResultsForm34A.cpp
-    Candidate.cpp
-    CandidateResult.cpp)
+add_subdirectory(Entities)
 
-set(ElectionCount_Headers
-    County.hxx
-    Constituency.hxx
-    Ward.hxx
-    PollingCenter.hxx
-    PollingStation.hxx
-    ResultsForm34A.hxx
-    Candidate.hxx
-    CandidateResult.hxx
-    votes_view.hxx)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
-
-find_package(ODB REQUIRED COMPONENTS sqlite)
-include(${ODB_USE_FILE})
-
-odb_compile(
-  ElectionCount_Odb_Sources
-  FILES
-  ${ElectionCount_Headers}
-  DB
-  sqlite
-  GENERATE_QUERY
-  GENERATE_SESSION
-  STANDARD
-  c++20)
-
-add_library(ElectionCountLib ${ElectionCount_Sources})
-target_include_directories(ElectionCountLib
-                           PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-target_link_libraries(ElectionCountLib PUBLIC project_options project_warnings)
-
-add_library(ElectionOdb ${ElectionCount_Odb_Sources})
-
-target_compile_definitions(ElectionOdb PUBLIC DATABASE_SQLITE)
-
-target_include_directories(ElectionOdb PUBLIC ${ODB_INCLUDE_DIRS}
-                                              ${ODB_COMPILE_OUTPUT_DIR})
 add_executable(ElectionCount Main.cpp database.cpp)
 
-target_link_libraries(ElectionCount PRIVATE ElectionCountLib ElectionOdb
-                                            ${ODB_LIBRARIES})
+target_link_libraries(ElectionCount PRIVATE ElectionCountLib ElectionOdb)
 
 file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
      ${CMAKE_SOURCE_DIR}/compile_commands.json COPY_ON_ERROR SYMBOLIC)
@@ -110,5 +62,5 @@ file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
 file(CREATE_LINK ${CMAKE_BINARY_DIR}/ElectionCount
      ${CMAKE_SOURCE_DIR}/ElectionCount SYMBOLIC)
 
-file(COPY_FILE ${CMAKE_SOURCE_DIR}/Elections.db ${CMAKE_BINARY_DIR}/Elections.db
-     ONLY_IF_DIFFERENT)
+file(COPY_FILE ${CMAKE_SOURCE_DIR}/Elections.db
+     ${CMAKE_BINARY_DIR}/Elections.db ONLY_IF_DIFFERENT)
