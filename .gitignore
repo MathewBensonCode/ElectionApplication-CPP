@@ -11,8 +11,8 @@ compile_commands.json
 CMakeCache.txt
 .cache
 
-#ExecutableName
-Election_Count
+#ExecutableLinkName
+ElectionCount
 
 # Prerequisites
 *.d

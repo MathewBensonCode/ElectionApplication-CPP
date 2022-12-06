@@ -69,8 +69,7 @@ set(ElectionCount_Headers
     ResultsForm34A.hxx
     Candidate.hxx
     CandidateResult.hxx
-    votes_view.hxx
-)
+    votes_view.hxx)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
@@ -89,8 +88,8 @@ odb_compile(
   c++20)
 
 add_library(ElectionCountLib ${ElectionCount_Sources})
-
-target_include_directories(ElectionCountLib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(ElectionCountLib
+                           PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_link_libraries(ElectionCountLib PUBLIC project_options project_warnings)
 
@@ -100,13 +99,16 @@ target_compile_definitions(ElectionOdb PUBLIC DATABASE_SQLITE)
 
 target_include_directories(ElectionOdb PUBLIC ${ODB_INCLUDE_DIRS}
                                               ${ODB_COMPILE_OUTPUT_DIR})
+add_executable(ElectionCount Main.cpp database.cpp)
 
-add_executable(ElectionCount 
-    Main.cpp
-    database.cpp
-    )
+target_link_libraries(ElectionCount PRIVATE ElectionCountLib ElectionOdb
+                                            ${ODB_LIBRARIES})
 
-target_link_libraries(ElectionCount PRIVATE ElectionCountLib ElectionOdb ${ODB_LIBRARIES})
+file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
+     ${CMAKE_SOURCE_DIR}/compile_commands.json COPY_ON_ERROR SYMBOLIC)
 
-# file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
-# ${CMAKE_SOURCE_DIR}/compile_commands.json)
+file(CREATE_LINK ${CMAKE_BINARY_DIR}/ElectionCount
+     ${CMAKE_SOURCE_DIR}/ElectionCount SYMBOLIC)
+
+file(COPY_FILE ${CMAKE_SOURCE_DIR}/Elections.db ${CMAKE_BINARY_DIR}/Elections.db
+     ONLY_IF_DIFFERENT)

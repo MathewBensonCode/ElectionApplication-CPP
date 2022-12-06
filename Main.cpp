@@ -10,7 +10,6 @@
 
 int main() {
 
-
   auto database = create_database();
 
   try {
@@ -25,7 +24,8 @@ int main() {
         std::cout<<"County Name: " << county.Name() <<'\n';
 
         for(const auto& constituency: county.Constituencies()){
-            std::cout<<"\tConstituency Name: "<< constituency->Name()<<'\n';
+            auto constituency_lock = constituency.lock();
+            std::cout<<"\tConstituency Name: "<< constituency_lock->Name()<<'\n';
         }
     }
     
