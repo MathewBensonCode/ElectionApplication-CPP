@@ -52,9 +52,13 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 add_subdirectory(Entities)
 
-add_executable(ElectionCount Main.cpp database.cpp)
+add_subdirectory(Repository)
 
-target_link_libraries(ElectionCount PRIVATE ElectionCountLib ElectionOdb)
+add_executable(ElectionCount Main.cpp)
+
+target_include_directories(ElectionCount PRIVATE ElectionRepository)
+
+target_link_libraries(ElectionCount PRIVATE ElectionRepository)
 
 file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
      ${CMAKE_SOURCE_DIR}/compile_commands.json COPY_ON_ERROR SYMBOLIC)

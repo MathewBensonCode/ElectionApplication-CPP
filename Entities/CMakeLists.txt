@@ -17,7 +17,7 @@ set(ElectionCount_Headers
     include/ResultsForm34A.hxx
     include/Candidate.hxx
     include/CandidateResult.hxx
-    include/votes_view.hxx)
+    votes_view.hxx)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
