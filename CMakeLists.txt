@@ -54,11 +54,13 @@ add_subdirectory(Entities)
 
 add_subdirectory(Repository)
 
+add_subdirectory(GtkUI)
+
 add_executable(ElectionCount Main.cpp)
 
-target_include_directories(ElectionCount PRIVATE ElectionRepository)
+target_include_directories(ElectionCount PRIVATE GtkUI)
 
-target_link_libraries(ElectionCount PRIVATE ElectionRepository)
+target_link_libraries(ElectionCount PRIVATE GtkUI)
 
 file(CREATE_LINK ${CMAKE_BINARY_DIR}/compile_commands.json
      ${CMAKE_SOURCE_DIR}/compile_commands.json COPY_ON_ERROR SYMBOLIC)

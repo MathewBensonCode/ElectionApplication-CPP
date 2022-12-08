@@ -4,7 +4,10 @@
 #include <vector>
 #include "database.hpp"
 
-class County;
+struct CountyInfo{
+    std::string Name;
+    unsigned int Id;
+};
 
 class Repository {
   odb::session m_session{};
@@ -12,4 +15,5 @@ class Repository {
 
 public:
   void PrintCounties();
+  std::vector<CountyInfo> GetCounties();
 };
