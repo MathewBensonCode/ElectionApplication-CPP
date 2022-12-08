@@ -10,7 +10,7 @@ class PollingStation;
 
 class PollingCenter {
 
-  int m_id{};
+  unsigned int m_id{};
 
   std::string m_name{};
 
@@ -21,8 +21,8 @@ class PollingCenter {
   friend odb::access;
 
 public:
-  [[nodiscard]] int Id() const;
-  void Id(int);
+  [[nodiscard]] unsigned int Id() const;
+  void Id(unsigned int);
 
   [[nodiscard]] const std::string &Name() const;
   void Name(const std::string &);

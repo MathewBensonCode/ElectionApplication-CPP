@@ -2,12 +2,8 @@
 #include <odb/database.hxx>
 #include <odb/session.hxx>
 #include <vector>
+#include "County.hxx"
 #include "database.hpp"
-
-struct CountyInfo{
-    std::string Name;
-    unsigned int Id;
-};
 
 class Repository {
   odb::session m_session{};
@@ -15,5 +11,5 @@ class Repository {
 
 public:
   void PrintCounties();
-  std::vector<CountyInfo> GetCounties();
+  std::vector<County> GetCounties();
 };

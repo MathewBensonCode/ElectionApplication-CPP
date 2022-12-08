@@ -1,6 +1,11 @@
 #include "ElectionsWindow.hpp"
+#include "Constituency.hxx"
+#include "PollingCenter.hxx"
+#include "PollingStation.hxx"
+#include "Ward.hxx"
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 ElectionsWindow::ElectionsWindow() {
   m_refTreeStore = Gtk::TreeStore::create(m_Columns);
@@ -8,10 +13,45 @@ ElectionsWindow::ElectionsWindow() {
   auto counties = m_repository.GetCounties();
 
   for (auto &county : counties) {
-    auto iter = m_refTreeStore->append();
-    auto row = *iter;
-    row[m_Columns.m_col_text] = county.Name;
-    row[m_Columns.m_col_number] = static_cast<int>(county.Id);
+    auto county_row = *(m_refTreeStore->append());
+    county_row[m_Columns.m_col_text] = county.Name();
+    county_row[m_Columns.m_col_number] = static_cast<int>(county.Id());
+
+    for (const auto &constituency : county.Constituencies()) {
+      auto constituency_row = *(m_refTreeStore->append(county_row.children()));
+      auto myconstituency = constituency.lock();
+      constituency_row[m_Columns.m_col_text] = myconstituency->Name();
+      constituency_row[m_Columns.m_col_number] =
+          static_cast<int>(myconstituency->Id());
+
+      for (const auto &ward : myconstituency->Wards()) {
+        auto ward_row = *(m_refTreeStore->append(constituency_row.children()));
+        auto myward = ward.lock();
+        ward_row[m_Columns.m_col_text] = myward->Name();
+        ward_row[m_Columns.m_col_number] = static_cast<int>(myward->Id());
+
+        for (const auto &pollingcenter : myward->PollingCenters()) {
+          auto pollingcenter_row =
+              *(m_refTreeStore->append(ward_row.children()));
+          auto mypollingcenter = pollingcenter.lock();
+          pollingcenter_row[m_Columns.m_col_text] = mypollingcenter->Name();
+          pollingcenter_row[m_Columns.m_col_number] =
+              static_cast<int>(mypollingcenter->Id());
+
+          for (const auto &pollingstation :
+               mypollingcenter->PollingStations()) {
+            auto pollingstation_row =
+                *(m_refTreeStore->append(pollingcenter_row.children()));
+            auto mypollingstation = pollingstation.lock();
+            std::stringstream str_strm{}; 
+            str_strm << mypollingstation->Name()<<' '<<mypollingstation->altId();
+            pollingstation_row[m_Columns.m_col_text] = str_strm.str();
+            pollingstation_row[m_Columns.m_col_number] =
+                static_cast<int>(mypollingstation->Id());
+          }
+        }
+      }
+    }
   }
 
   set_child(m_scrolledwindow);

@@ -1,11 +1,11 @@
 #include "PollingCenter.hxx"
 
-int PollingCenter::Id() const
+unsigned int PollingCenter::Id() const
 {
     return m_id;
 }
 
-void PollingCenter::Id(const int newid)
+void PollingCenter::Id(const unsigned int newid)
 {
     m_id = newid;
 }
