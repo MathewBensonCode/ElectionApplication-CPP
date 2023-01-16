@@ -29,6 +29,10 @@ std::vector<County> Repository::GetCounties() {
 
   std::vector<County> counties{};
 
+  const size_t number_of_counties{48};
+
+  counties.reserve(number_of_counties);
+
   for (const auto &county : results) {
       counties.push_back(county);
     }

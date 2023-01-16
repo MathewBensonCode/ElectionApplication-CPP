@@ -1,8 +1,8 @@
+#include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treemodelcolumn.h>
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/window.h>
-#include <gtkmm/scrolledwindow.h>
 #include <repository.hpp>
 
 struct ModelColumns : public Gtk::TreeModelColumnRecord {
@@ -12,6 +12,10 @@ struct ModelColumns : public Gtk::TreeModelColumnRecord {
     add(m_col_number);
   }
 
+  [[nodiscard]] auto &TextColumn() const { return m_col_text; }
+  [[nodiscard]] auto &NumberColumn() const { return m_col_number; }
+
+private:
   Gtk::TreeModelColumn<Glib::ustring> m_col_text;
   Gtk::TreeModelColumn<int> m_col_number;
 };
