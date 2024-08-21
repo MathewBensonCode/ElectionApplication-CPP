@@ -10,7 +10,7 @@ class CandidateResult;
 class Candidate {
 
   unsigned int m_id{};
-  std::string m_name{};
+  std::string m_name;
 
   std::vector<std::weak_ptr<CandidateResult>> m_candidateresults;
 

@@ -7,5 +7,5 @@ pkg_check_modules(
 
 add_library(GtkUI)
 target_sources(GtkUI PRIVATE ElectionsWindow.cpp)
-target_include_directories(GtkUI PUBLIC ElectionRepository PkgConfig::GTKMM)
-target_link_libraries(GtkUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PkgConfig::GTKMM ElectionRepository)
+target_include_directories(GtkUI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ElectionRepository PkgConfig::GTKMM)
+target_link_libraries(GtkUI PUBLIC PkgConfig::GTKMM ElectionRepository)

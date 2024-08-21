@@ -2,6 +2,12 @@
 #include "Constituency.hxx"
 #include "County_odb.hpp"
 #include <iostream>
+#include <odb/database.hxx>
+#include <odb/sqlite/database.hxx>
+#include <memory>
+
+Repository::Repository(const std::string& dbname): 
+    m_database(std::make_unique<odb::sqlite::database>(odb::sqlite::database(dbname))){}
 
 void Repository::PrintCounties() {
 
@@ -25,7 +31,7 @@ std::vector<County> Repository::GetCounties() {
 
   odb::transaction transaction(m_database->begin());
 
-  auto results = m_database->query(odb::query<County>());
+  auto results = m_database->query<County>();
 
   std::vector<County> counties{};
 

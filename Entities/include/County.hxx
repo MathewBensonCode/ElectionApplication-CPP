@@ -5,7 +5,6 @@
 
 #include <odb/core.hxx>
 
-
 class Constituency;
 
 class County {
@@ -35,4 +34,3 @@ public:
 #include "Constituency.hxx"
 
 #endif
-

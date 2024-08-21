@@ -21,11 +21,11 @@ private:
 };
 
 class ElectionsWindow : public Gtk::Window {
-  ModelColumns m_Columns{};
-  Repository m_repository{};
+  ModelColumns m_Columns;
+  Repository m_repository;
   Glib::RefPtr<Gtk::TreeStore> m_refTreeStore;
-  Gtk::TreeView m_treeview{};
-  Gtk::ScrolledWindow m_scrolledwindow{};
+  Gtk::TreeView m_treeview;
+  Gtk::ScrolledWindow m_scrolledwindow;
 
 public:
   ElectionsWindow();

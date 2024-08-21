@@ -21,6 +21,8 @@ set(ElectionCount_Headers
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
+set(PKG_CONFIG_ARGN "--with-path=/home/benson/.local/lib/pkgconfig")
+
 find_package(ODB REQUIRED COMPONENTS sqlite)
 include(${ODB_USE_FILE})
 
@@ -39,9 +41,9 @@ add_library(ElectionCountLib)
 
 target_sources(ElectionCountLib PRIVATE ${ElectionCount_Sources})
 
-target_include_directories(ElectionCountLib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(ElectionCountLib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${ODB_INCLUDE_DIRS})
 
-target_link_libraries(ElectionCountLib PUBLIC project_options project_warnings)
+target_link_libraries(ElectionCountLib PUBLIC project_options project_warnings ${ODB_LIBRARIES})
 
 add_library(ElectionOdb ${ElectionCount_Odb_Sources})
 
