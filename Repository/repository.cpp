@@ -1,37 +1,23 @@
 #include "repository.hpp"
-#include "Constituency.hxx"
 #include "County_odb.hpp"
-#include <iostream>
-#include <odb/database.hxx>
-#include <odb/sqlite/database.hxx>
+#include "Constituency_odb.hpp"
+#include "Ward.hxx"
+#include "Ward_odb.hpp"
+#include "PollingCenter_odb.hpp"
 #include <memory>
+#include <odb/database.hxx>
+#include <odb/result.hxx>
+#include <odb/sqlite/database.hxx>
 
-Repository::Repository(const std::string& dbname): 
-    m_database(std::make_unique<odb::sqlite::database>(odb::sqlite::database(dbname))){}
-
-void Repository::PrintCounties() {
-
-  odb::transaction transaction(m_database->begin());
-
-  auto results = m_database->query(odb::query<County>());
-
-  for (const auto &county : results) {
-    std::cout << "County Name: " << county.Name() << '\n';
-
-    for (const auto &constituency : county.Constituencies()) {
-      auto constituency_lock = constituency.lock();
-      std::cout << "\tConstituency Name: " << constituency_lock->Name() << '\n';
-    }
-  }
-
-  transaction.commit();
-}
+Repository::Repository(const std::string &dbname)
+    : m_database(std::make_unique<odb::sqlite::database>(
+          odb::sqlite::database(dbname))) {}
 
 std::vector<County> Repository::GetCounties() {
 
   odb::transaction transaction(m_database->begin());
 
-  auto results = m_database->query<County>();
+  auto results = m_database->query(odb::query<County>());
 
   std::vector<County> counties{};
 
@@ -40,10 +26,48 @@ std::vector<County> Repository::GetCounties() {
   counties.reserve(number_of_counties);
 
   for (const auto &county : results) {
-      counties.push_back(county);
-    }
+    counties.push_back(county);
+  }
 
   transaction.commit();
 
   return counties;
+}
+
+Constituency Repository::GetConstituency(const unsigned int constituencyid) {
+
+  odb::transaction transaction(m_database->begin());
+
+  Constituency constituency;
+
+  m_database->load(constituencyid, constituency);
+
+  transaction.commit();
+
+  return constituency;
+}
+
+Ward Repository::GetWard(const unsigned int wardid){
+
+  odb::transaction transaction(m_database->begin());
+
+  Ward ward;
+
+  m_database->load(wardid, ward);
+
+  transaction.commit();
+
+  return ward;
+}
+
+PollingCenter Repository::GetPollingCenter(const unsigned int pollingcenterid){
+    odb::transaction transaction(m_database->begin());
+    
+    PollingCenter pollingCenter;
+
+    m_database->load(pollingcenterid, pollingCenter);
+
+    transaction.commit();
+
+    return pollingCenter;
 }

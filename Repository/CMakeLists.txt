@@ -6,6 +6,6 @@ target_sources(
   PRIVATE FILE_SET repository_headers TYPE HEADERS FILES repository.hpp database.hpp)
 
 target_include_directories(
-    ElectionRepository PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ElectionCountLib ElectionOdb)
+    ElectionRepository PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(ElectionRepository PUBLIC ElectionCountLib ElectionOdb)
